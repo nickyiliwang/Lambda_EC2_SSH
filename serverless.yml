@@ -1,0 +1,18 @@
+service: stuff
+
+frameworkVersion: '3'
+
+provider:
+  profile: iamadmin
+  name: aws
+  runtime: nodejs14.x
+  Version: '2012-10-17'
+  iam:
+    role:
+        statements:
+        managedPolicies:
+          - "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+
+functions:
+  hello:
+    handler: handler.hello
