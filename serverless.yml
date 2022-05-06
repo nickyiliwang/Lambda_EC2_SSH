@@ -16,6 +16,11 @@ functions:
   ssh:
     handler: index.handler
     url: true
+    events:
+    - http:
+        method: POST
+        path: /
+        cors: true
 
 plugins:
   - serverless-offline    

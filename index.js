@@ -1,5 +1,4 @@
 exports.handler = async (event) => {
-  const fs = require("fs");
   const { NodeSSH } = require("node-ssh");
   const ssh = new NodeSSH();
 
@@ -7,30 +6,42 @@ exports.handler = async (event) => {
   const user = "ec2-user";
   const host = "44.197.76.136";
 
-  let ourout = "";
+  let stdout = "";
 
   let cmd = "ls";
-  if (event.cmd == "long") {
-    cmd += " -l";
+
+  const { command, cwd } = JSON.parse(event.body);
+  console.log(command, cwd);
+  if (!command || !cwd) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify("empty command/cwd"),
+    };
   }
 
-  ssh
-    .connect({
+  cmd = command;
+
+  try {
+    const connection = await ssh.connect({
       host: host,
       username: user,
       privateKey: pemfile,
-    })
-    .then(() => {
-      ssh.execCommand(cmd, { cwd: "/var" }).then(function (result) {
-        ourout = result.stdout;
-        console.log("STDOUT: " + result.stdout);
-        console.log("STDERR: " + result.stderr);
-
-        const response = {
-          statusCode: 200,
-          body: ourout,
-        };
-        return response;
-      });
     });
+
+    const result = await connection.execCommand(cmd, { cwd: cwd });
+
+    if (result.stderr) {
+      console.log("STDERR: " + result.stderr);
+    }
+    stdout = result.stdout;
+    console.log("STDOUT: " + result.stdout);
+  } catch (error) {
+    console.error(error);
+  }
+
+  const response = {
+    statusCode: 200,
+    body: JSON.stringify(stdout),
+  };
+  return response;
 };

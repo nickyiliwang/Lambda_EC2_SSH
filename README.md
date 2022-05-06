@@ -1,6 +1,10 @@
 # Lambda_EC2_SSH
 
-
+sample POST request:
+{
+"command": "touch index.html",
+"cwd": "/home/ec2-user"
+}
 
 Credits:
 
