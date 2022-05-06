@@ -1,4 +1,4 @@
-service: stuff
+service: lambda-ec2-ssh
 
 frameworkVersion: '3'
 
@@ -6,7 +6,6 @@ provider:
   profile: iamadmin
   name: aws
   runtime: nodejs14.x
-  Version: '2012-10-17'
   iam:
     role:
         statements:
@@ -14,5 +13,9 @@ provider:
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 
 functions:
-  hello:
-    handler: handler.hello
+  ssh:
+    handler: index.handler
+    url: true
+
+plugins:
+  - serverless-offline    
